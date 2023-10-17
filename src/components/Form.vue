@@ -46,7 +46,7 @@ const selected = computed((): DropdownItem | undefined => items.value.find(bank 
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
+  <form @submit.prevent="onSubmit" class="dark:bg-gray-700 py-2 px-4 rounded border border-gray-500">
     <QInput v-model="info.name" placeholder="Nhập tên chủ tài khoản" label="Chủ tài khoản:"/>
     <Dropdown :items="items" v-model="info.bank" class="block" label="Ngân hàng">
       <template #selected>
@@ -60,7 +60,7 @@ const selected = computed((): DropdownItem | undefined => items.value.find(bank 
         <div class="flex items-center p-3 cursor-pointer">
           <img :src="logo" alt="" class="max-w-[58px] mr-2 dark:bg-white">
           <div>
-            {{ text }}: <span class="text-sm">{{ name }}</span>
+            {{ text }}: <span class="text-xs">{{ name }}</span>
           </div>
         </div>
       </template>
@@ -69,7 +69,7 @@ const selected = computed((): DropdownItem | undefined => items.value.find(bank 
     <QInput v-model="info.amount" type="number" placeholder="Nhập số tiền" label="Số tiền:"/>
     <button type="button"
             @click.prevent="onSubmit"
-            class="block w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+            class="border border-gray-600 block w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800">
       {{ isEdit ? "Cập nhật" : "Tạo ngay"}}
     </button>
   </form>
