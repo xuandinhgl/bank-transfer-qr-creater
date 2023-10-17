@@ -10,7 +10,6 @@ export const useSyncProps = <T, PT>(
       return props[key] as T;
     },
     set(value) {
-      console.log(value)
       emit(`update:${key as string}`, value);
     },
   });

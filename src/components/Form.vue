@@ -66,6 +66,7 @@ const selected = computed((): DropdownItem | undefined => items.value.find(bank 
       </template>
     </Dropdown>
     <QInput v-model="info.account" placeholder="Nhập số tài khoản" label="Số tài khoản:"/>
+    <QInput v-model="info.amount" type="number" placeholder="Nhập số tiền" label="Số tiền:"/>
     <button type="button"
             @click.prevent="onSubmit"
             class="block w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">

@@ -3,20 +3,21 @@ import {v4 as uuid} from "uuid";
 
 import Form from "./components/Form.vue"
 import Modal from "./components/Modal.vue";
-import {computed, onBeforeMount, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Bank, Account} from "./types.ts";
 import {accountEmpty} from "./constant.ts";
 import {getBanks, getQRCodeURL} from "./utils.ts";
 import AccountRow from "./components/AccountRow.vue";
 import {deleteAccountInfo, getAccountInfo, saveAccountInfo, updateAccountInfo} from "./accountService.ts";
 import Header from "./components/Header.vue";
+import QRPreview from "./components/QRPreview.vue";
 
 const info = ref<Account>({...accountEmpty})
 const accounts = ref<Account[]>([])
 
-const recentAccount = ref("")
+const recentAccount = ref<null | Account>(null)
 
-onBeforeMount(async () => {
+onMounted(async () => {
   banks.value = await getBanks();
   getAccount()
 })
@@ -36,7 +37,7 @@ const onCreateQR = async (account: Account) => {
     updateAccountInfo(account)
   } else {
     const id = uuid()
-    recentAccount.value = id
+    recentAccount.value = {...account, qr: qrCode, id}
     saveAccountInfo({...account, qr: qrCode, id})
   }
   getAccount()
@@ -51,7 +52,7 @@ const onDeleteAccount = (id: string) => {
 
 const onEdit = (id: string) => {
   isShowForm.value = true
-  recentAccount.value = ""
+  recentAccount.value = null
   info.value = accounts.value.find(a => a.id === id) as Account
 }
 
@@ -59,33 +60,20 @@ const isShowForm = ref(false)
 
 const isShowQr = computed({
   get() {
-    const account = accounts.value.find(a => a.id === recentAccount.value)
+    const account = accounts.value.find(a => a.id === recentAccount?.value?.id )
     return !!recentAccount.value && !!account
   },
   set() {
-    recentAccount.value = ""
+    recentAccount.value = null
   }
 })
-const recentQrCode = computed(() => accounts.value.find(a => a.id === recentAccount.value)?.qr || "")
+
 </script>
 
 <template>
-  <div class="md:max-w-[500px] mx-auto py-2">
+  <div class="md:max-w-[500px] mx-auto p-2">
     <Header @add-qr="isShowForm = true"/>
-    <Modal v-model="isShowQr" footer>
-      <div class="max-w-[300px] p-1 border">
-        <img width="290" height="344" :src="recentQrCode" alt="">
-      </div>
-      <template #footer>
-        <button
-            type="button"
-            class="w-full text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-            @click="onEdit(recentAccount)"
-        >
-          Sửa
-        </button>
-      </template>
-    </Modal>
+    <QRPreview v-if="recentAccount" v-model="isShowQr" :account="recentAccount" @edit="onEdit" />
     <Modal v-model="isShowForm">
       <div class="w-full md:w-[500px]">
         <Form v-model="info" @create-qr="onCreateQR" :banks="banks"/>
@@ -99,7 +87,7 @@ const recentQrCode = computed(() => accounts.value.find(a => a.id === recentAcco
             <AccountRow v-for="(item, index) in accounts"
                         :account="item"
                         :key="`${item.bank}-${index}`"
-                        @open-qr="recentAccount = item.id"
+                        @open-qr="recentAccount = item"
                         @delete="onDeleteAccount(item.id)"
             />
           </ul>
